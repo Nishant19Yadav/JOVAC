@@ -115,8 +115,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   divisions: 5,
                   label: _sliderValue.round().toString(),
                   onChanged: (val)=>setState(()=>_sliderValue=val),
+                ),
+                SizedBox(height: 20,),
+                Text('GestureDetector'),
+                GestureDetector(
+                  onTap: ()=>print('Tapped'),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    color: Colors.amber,
+                    child: Text('Tap me'),
+                  ),
                 )
-
 
               ],
             )
