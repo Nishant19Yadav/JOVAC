@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  final String sampleString = "Hello coming from HomeScreen";
   const HomeScreen({super.key});
 
   @override
@@ -35,7 +36,9 @@ class HomeScreen extends StatelessWidget {
             title: Text('Push worked with MaterialPageRoute'),
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => AboutPage()),
+              MaterialPageRoute(builder: (_) => AboutPage(
+                sampleString: sampleString,
+              )),
             ),
           ),
           ListTile(
@@ -81,13 +84,20 @@ class HomeScreen extends StatelessWidget {
 }
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
+  final String? sampleString;
+  const AboutPage({super.key, this.sampleString});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('About Page'), centerTitle: true),
-      body: Center(child: Column(children: [Text('Hello!..')])),
+      body: Center(
+          child: Column(
+              children: [
+                Text(sampleString.toString())
+              ]
+          )
+      ),
     );
   }
 }
@@ -105,7 +115,7 @@ class ContactPage extends StatelessWidget {
       body: Center(
           child: Column(
             children: [
-              Text('Contact'),
+              Text(''),
               ElevatedButton(onPressed: ()=>Navigator.pop(context), child: Text('Back'))
             ],
 
