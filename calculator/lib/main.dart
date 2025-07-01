@@ -20,69 +20,84 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text('Choose Calculator'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        title: Text(
+          'Dashboard',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        iconTheme: IconThemeData(color: Colors.black),
       ),
-      body: Stack(
-        children: [
-          Opacity(
-            opacity: 0.6,
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/fitness-man.webp'),
-                  fit: BoxFit.cover,
-                ),
-              ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome back, 👋',
+              style: TextStyle(fontSize: 18, color: Colors.grey[700]),
             ),
-          ),
-          Positioned.fill(
-            child: Column(
-              children: [
-                Spacer(flex: 6),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.push(
+            SizedBox(height: 6),
+            Text(
+              'User',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 32),
+
+
+            // Calorie Intake Button
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: Colors.deepPurple[100],
+              child: ListTile(
+                leading: Icon(Icons.local_fire_department, color: Colors.deepPurple),
+                title: Text('Calorie Intake Calculator'),
+                onTap: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => CalorieCalculatorScreen()),
-                  ),
-                  icon: Icon(Icons.local_fire_department, color: Colors.white),
-                  label: Text('Calorie Intake Calculator'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.push(
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Protein Intake Button
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: Colors.deepPurple[100],
+              child: ListTile(
+                leading: Icon(Icons.restaurant_rounded, color: Colors.deepPurple),
+                title: Text('Protein Intake Calculator'),
+                onTap: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => ProteinCalculatorScreen()),
-                  ),
-                  icon: Icon(Icons.restaurant_rounded, color: Colors.white),
-                  label: Text('Protein Intake Calculator'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                ),
-                Spacer(flex: 4),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                ),
-                SizedBox(height: 16),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 16),
+
+// 🔥 NEW: Calculate Your Meal Button
+            Card(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: Colors.deepPurple[100],
+              child: ListTile(
+                leading: Icon(Icons.fastfood_rounded, color: Colors.deepPurple),
+                title: Text('Calculate Your Meal'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => MealCalculatorScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -126,8 +141,8 @@ class ProteinCalculatorScreen extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
       ),
       body: IntakeForm(
-        title: 'Protein Intake Calculator',
-        resultLabel: 'Recommended Protein Intake',
+        title: 'Recommended Protein Intake',
+        resultLabel: '',
         resultValue: '84 grams/day',
         showInfoNote: false,
         ageController: ageController,
@@ -137,6 +152,134 @@ class ProteinCalculatorScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+class MealCalculatorScreen extends StatefulWidget {
+  @override
+  _MealCalculatorScreenState createState() => _MealCalculatorScreenState();
+}
+
+class _MealCalculatorScreenState extends State<MealCalculatorScreen> {
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController foodController = TextEditingController();
+
+  final Map<String, double> foodCaloriesPer100g = {
+    'rice': 130,
+    'chapati': 104,
+    'egg': 155,
+    'milk': 42,
+    'chicken': 165,
+    'banana': 89,
+    'apple': 52,
+    'paneer': 265,
+    'dal': 116,
+    'potato': 77,
+  };
+
+  void calculateCalories() {
+    String food = foodController.text.trim().toLowerCase();
+    double quantity = double.tryParse(quantityController.text.trim()) ?? 0;
+
+    if (!foodCaloriesPer100g.containsKey(food)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Food not found in database. Try rice, dal, egg...')),
+      );
+      return;
+    }
+
+    double calPer100g = foodCaloriesPer100g[food]!;
+    double estimatedCalories = (calPer100g / 100) * quantity;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Estimated Calories"),
+        content: Text(
+          "$quantity g of $food ≈ ${estimatedCalories.toStringAsFixed(1)} kcal",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("OK"),
+          )
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Calculate Your Meal"),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: ListView(
+          children: [
+            Text(
+              "Enter Food Details",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 24),
+
+            // Dropdown for food selection
+            DropdownButtonFormField<String>(
+              value: foodController.text.isEmpty ? null : foodController.text,
+              items: foodCaloriesPer100g.keys.map((food) {
+                return DropdownMenuItem(
+                  value: food,
+                  child: Text(food[0].toUpperCase() + food.substring(1)),
+                );
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  foodController.text = val!;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Select Food Item',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            TextField(
+              controller: quantityController,
+              decoration: InputDecoration(
+                labelText: 'Quantity in grams',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(height: 24),
+
+            ElevatedButton.icon(
+              onPressed: calculateCalories,
+              icon: Icon(Icons.calculate, color: Colors.white),
+              label: Text('Estimate Calories'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 
 class IntakeForm extends StatefulWidget {
   final String title;
@@ -174,12 +317,13 @@ class _IntakeFormState extends State<IntakeForm> {
       padding: const EdgeInsets.all(24.0),
       child: ListView(
         children: [
+          SizedBox(height: 12,),
           Text(
             widget.title,
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 12),
+
           Text(
             widget.resultLabel,
             style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
@@ -191,7 +335,7 @@ class _IntakeFormState extends State<IntakeForm> {
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 16),
-          Text('Enter your details to calculate daily calorie needs.', textAlign: TextAlign.center),
+          Text('Enter your details to calculate daily needs.', textAlign: TextAlign.center),
           SizedBox(height: 24),
 
           Text('Age:'),
@@ -276,7 +420,7 @@ class _IntakeFormState extends State<IntakeForm> {
           ),
           SizedBox(height: 24),
 
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () {
               final age = int.tryParse(widget.ageController.text) ?? 0;
               final weight = double.tryParse(widget.weightController.text) ?? 0;
@@ -285,7 +429,7 @@ class _IntakeFormState extends State<IntakeForm> {
               double weightKg = weightUnit == 'Kg' ? weight : weight * 0.453592;
               double heightCm = heightUnit == 'Cm' ? height : height * 30.48;
 
-              if(age > 150){
+              if (age > 150) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Age exceeds the allowed limit.')),
                 );
@@ -299,7 +443,6 @@ class _IntakeFormState extends State<IntakeForm> {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Height exceeds the allowed limit.')));
                 return;
               }
-
 
               double activityFactor = 1.2;
               if (activityLevel == 'Moderate') activityFactor = 1.55;
@@ -340,14 +483,32 @@ class _IntakeFormState extends State<IntakeForm> {
                 ),
               );
             },
+            icon: Icon(Icons.calculate, color: Colors.white),  // ← Your desired icon
+            label: Text('Calculate'),
             style: ElevatedButton.styleFrom(
+
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 16),
-              textStyle: TextStyle(fontSize: 18),
+              textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 5,
             ),
-            child: Text('Calculate'),
+            // child: Text('Calculate'),
           ),
         ],
       ),
+    );
+  }
+}
+class PlaceholderScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Calculate Your Meal")),
+      //body: Center(child: Text("Meal Calculator Screen Coming Soon!")),
     );
   }
 }
